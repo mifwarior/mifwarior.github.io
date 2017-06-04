@@ -1,0 +1,103 @@
+<html>
+	<head>
+		<title>WebGlTest</title>
+	</head>
+	<body>
+		<div>Canvas:</div>
+		<canvas id="view" width=600 height=600 style ="background-color:wheat"></canvas>
+		
+		<script id="vs-simple" type="x-shader/x-vertex">
+			attribute vec4 a_Position;
+			uniform mat4 u_xformMatrix;
+			void main() 
+			{
+				gl_Position = u_xformMatrix * a_Position;
+				//gl_Position.w = 1.0;
+				//gl_PointSize = 10.0;
+			}
+		</script>
+		
+		<script id="fs-simple" type="x-shader/x-fragment">
+			precision mediump float;
+			uniform vec4 u_color;
+			void main()
+			{
+				gl_FragColor = u_color;
+			}
+		</script>
+		
+		<script id="vs-sprite" type="x-shader/x-vertex">
+			attribute vec4 a_Position;
+			uniform mat4 u_xformMatrix;
+			uniform mat4 u_scaleMatrix;
+			varying vec2 coord;
+      
+			void main() 
+			{
+				gl_Position = u_xformMatrix * u_scaleMatrix*a_Position;
+				vec4 crd = ( a_Position + vec4(1,1,1,0) )/ 2.0;
+				coord = vec2(crd.x, crd.y);
+				coord.y = 1.0 - coord.y;
+			}
+		
+		</script>
+		
+		<script id="fs-sprite" type="x-shader/x-fragment">
+			precision mediump float;
+			varying vec2 coord;
+			uniform sampler2D t_sprites;
+			uniform float u_tile;
+			void main()
+			{
+				float pos = float(u_tile);//0.0;
+				vec2 size = vec2(2.0,2.0);
+				int count = int(size.x) + int(size.y);
+				float y = floor(pos/size.y);
+				float x = mod(pos,size.x);
+				
+				vec2 textureCoord = vec2( (coord.x - x) / size.x, (coord.y - y) / size.y);
+				
+				vec4 color = texture2D(t_sprites, textureCoord);
+				
+				gl_FragColor = color;
+			}
+		
+		</script>
+		<script id="vs-points" type="x-shader/x-vertex">
+			attribute vec4 a_Position;
+			uniform mat4 u_xformMatrix;
+			uniform mat4 u_scaleMatrix;
+			varying vec2 coord;
+      
+			void main() 
+			{
+				gl_PointSize = 40.0;
+				gl_Position =  a_Position*u_xformMatrix;
+			}
+		
+		</script>
+		
+		<script id="fs-points" type="x-shader/x-fragment">
+			precision mediump float;
+			varying vec2 coord;
+			uniform sampler2D t_sprites;
+			uniform float u_tile;
+			void main()
+			{
+				int pos = int(u_tile);//0.0;
+				vec2 size = vec2(2.0,2.0);
+				int y = pos/int(size.x);
+				int x = pos - int(size.x) * y;;
+				vec2 textureCoord = vec2( (gl_PointCoord.x - float(x))/2.0, (gl_PointCoord.y - float(y) )/2.0);
+				
+				vec4 color = texture2D(t_sprites, textureCoord);
+				
+				gl_FragColor = color;
+			}
+		
+		</script>
+		<div> SCORE: <span id = "score"> </span></div>
+		<script src="ShaderCollection.js"></script>
+		<script src="pacman.js"></script>
+	</body>
+</html>
