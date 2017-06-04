@@ -1,0 +1,24 @@
+.name{
+	font-size: xx-large;
+    color: green;
+}
+.descr{
+	color: cadetblue;
+    font-size: larger;
+    text-align: center;
+    align-self: center;
+}
+.image{
+}
+.image img{
+	max-width: 20rem;
+    max-height: 20rem;
+}
+.container{
+	display: flex;
+    max-width: 40rem;
+    border: 1px solid green
+}
+a {
+	text-decoration:none;
+}

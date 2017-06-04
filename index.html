@@ -1,34 +1,27 @@
-<!doctype html>
-<html lang="en-us">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Unity WebGL Player | TankPrototype</title>
-    <link rel="stylesheet" href="TemplateData/style.css">
-    <link rel="shortcut icon" href="TemplateData/favicon.ico" />
-    <script src="TemplateData/UnityProgress.js"></script>
-  </head>
-  <body class="template">
-    <p class="header"><span>Unity WebGL Player | </span>TankPrototype</p>
-    <div class="template-wrap clear">
-      <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" height="600px" width="960px"></canvas>
-      <br>
-      <div class="logo"></div>
-      <div class="fullscreen"><img src="TemplateData/fullscreen.png" width="38" height="38" alt="Fullscreen" title="Fullscreen" onclick="SetFullscreen(1);" /></div>
-      <div class="title">TankPrototype</div>
-    </div>
-    <p class="footer">&laquo; created with <a href="http://unity3d.com/" title="Go to unity3d.com">Unity</a> &raquo;</p>
-    <script type='text/javascript'>
-  var Module = {
-    TOTAL_MEMORY: 268435456,
-    errorhandler: null,			// arguments: err, url, line. This function must return 'true' if the error is handled, otherwise 'false'
-    compatibilitycheck: null,
-    dataUrl: "Release/webGlBuild.data",
-    codeUrl: "Release/webGlBuild.js",
-    memUrl: "Release/webGlBuild.js.mem",
-  };
-</script>
-<script src="Release/UnityLoader.js"></script>
-
-  </body>
+<html>
+	<head>
+		<title>Примеры игр\технологий</title>
+		<link rel="stylesheet" type="text/css" href="css/style.css">
+	</head>
+	<body>
+		<a href="Pacman\index.html">
+			<div class="name">Pacman</div>
+			<div class="container">
+				<div class="descr">Мини игра на чистом WebGL без использования сторонних библиотек</div>
+				<div class="image">
+					<img src="img/pacman.jpg">
+				</div>
+			</div>
+		</a>
+		
+		<a href="Tank\index.html">
+			<div class="name">Tank</div>
+			<div class="container">
+				<div class="descr">Мини игра под Unity WebGL. Танк стреляет по баллистической траектории</div>
+				<div class="image">
+					<img src="img/tank.jpg">
+				</div>
+			</div>
+		</a>
+	</body>
 </html>
