@@ -340,14 +340,16 @@ function Pacman()
 			gl.vertexAttribPointer(a_Position, 3, gl.FLOAT, false, 0,0);
 			gl.enableVertexAttribArray(a_Position);
 			
-			var u_sprite = gl.getUniformLocation(program,"t_sprites");
-			gl.activeTexture(gl.TEXTURE0);
-			gl.bindTexture(gl.TEXTURE_2D, texture);
-			gl.uniform1i(u_sprite, 0);
-			gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+			if(texture !== undefined)
+			{
+				var u_sprite = gl.getUniformLocation(program,"t_sprites");
+				gl.activeTexture(gl.TEXTURE0);
+				gl.bindTexture(gl.TEXTURE_2D, texture);
+				gl.uniform1i(u_sprite, 0);
+				gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
 
-			gl.enable(gl.BLEND);
-			
+				gl.enable(gl.BLEND);
+			}
 			var u_xformMatrix = gl.getUniformLocation(program,"u_xformMatrix");
 			gl.uniformMatrix4fv(u_xformMatrix,false,this.matrix);
 				
@@ -454,14 +456,16 @@ function Pacman()
 			var u_scaleMatrix = gl.getUniformLocation(program,"u_scaleMatrix");
 			gl.uniformMatrix4fv(u_scaleMatrix,false,this.scaleMatrix);
 			
-			var u_sprite = gl.getUniformLocation(program,"u_sprite");
-			gl.activeTexture(gl.TEXTURE0);
-			gl.bindTexture(gl.TEXTURE_2D, texture);
-			gl.uniform1i(u_sprite, 0);
-			gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
-			
-			gl.enable(gl.BLEND);
-			
+			if(texture !== undefined)
+			{
+				var u_sprite = gl.getUniformLocation(program,"u_sprite");
+				gl.activeTexture(gl.TEXTURE0);
+				gl.bindTexture(gl.TEXTURE_2D, texture);
+				gl.uniform1i(u_sprite, 0);
+				gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+				
+				gl.enable(gl.BLEND);
+			}
 			var u_color = gl.getUniformLocation(program,"u_color");
 			gl.uniform4fv(u_color,this.color);
 			
