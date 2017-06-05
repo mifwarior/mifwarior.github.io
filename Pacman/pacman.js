@@ -169,12 +169,12 @@ function Pacman()
 	}
 	var map = [	
 				[2,2,2,2,1,2,2,2,1,2],
-				[2,1,0,0,0,0,1,0,1,2],
+				[2,1,0,0,0,0,1,4,1,2],
 				[1,1,0,1,1,1,0,0,0,0],
 				[2,0,0,1,2,1,0,1,1,1],
 				[1,1,0,1,2,1,0,1,0,0],
 				[0,2,0,0,2,0,0,2,2,2],
-				[0,2,1,1,0,1,0,1,0,0],
+				[0,2,1,1,3,1,0,1,0,0],
 				[0,1,1,2,0,0,0,1,2,1],
 				[0,0,1,0,1,1,1,1,2,1],
 				[2,2,1,0,2,2,2,0,2,1],
@@ -478,8 +478,10 @@ function Pacman()
 	
 	function MoveBehaviour(map, obj)
 	{
+		this.Stopped = true
 		this.Speed = 1;
 		this.applyAngle = true;
+		this.AnimateWhenStop = false;
 		var dir = {x:0,y:0};
 		var mapHeight = map.length;
 		var mapWidht = map[0].length;
@@ -521,9 +523,17 @@ function Pacman()
 		this.AnimationUpdate = function(dt)
 		{
 			t+= dt*20;
-			obj.GetPosition(v1);
-			if( (Math.abs(lastPos.x - v1.x) < 0.00001) && (Math.abs(lastPos.y - v1.y) < 0.00001) )  t = 0;
-			obj.GetPosition(lastPos);
+			
+			
+				obj.GetPosition(v1);
+				if( (Math.abs(lastPos.x - v1.x) < 0.00001) && (Math.abs(lastPos.y - v1.y) < 0.00001) )
+				{
+					if(!this.AnimateWhenStop)	t = 0;
+					this.Stopped = true;
+					
+				}else this.Stopped = false;
+				obj.GetPosition(lastPos);
+			
 			
 			obj.tile = t|0;
 			if(t > 4) t = 0;
@@ -627,8 +637,87 @@ function Pacman()
 		}.bind(this);
 		
 	}
+	
+	function Foe(gl)
+	{
+		BaseObject.call(this);
+		var vertices = new Float32Array([-1,1,0, 1,1,0, 1,-1,0, -1,-1,0]);
+		var indices = new Uint16Array([0,3,1,2,1,3]);
+		var scale = 0.08;
+		
+		var vertexBuffer;
+		var indicesBuffer;
+		
+		this.ShaderName = shaderNames.Sprite;
+		this.SetScale({x:scale,y:scale, z:scale});
+		this.color = new Float32Array([1,0.8,0,1]);
+		this.tile = 1;
+		
+		var heroImg;
+		var texture;
+		
+		DownloadImage("foe.png",function (image){
+			if(texture === undefined) texture = gl.createTexture();
+			gl.bindTexture(gl.TEXTURE_2D, texture);
+			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+			gl.generateMipmap(gl.TEXTURE_2D);
+			gl.bindTexture(gl.TEXTURE_2D, null);
+		});
 
-	function CoinEatBehaviour(obj,map,coins)
+
+		this.Draw = function()
+		{
+			SetShader(this.ShaderName);
+			if(texture === undefined) texture = gl.createTexture();
+			
+			if(vertexBuffer === undefined)	
+			{
+				vertexBuffer = gl.createBuffer();
+				gl.bindBuffer(gl.ARRAY_BUFFER,vertexBuffer);
+				gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+			}
+			if(indicesBuffer === undefined)
+				indicesBuffer = gl.createBuffer();
+			
+			gl.bindBuffer(gl.ARRAY_BUFFER,vertexBuffer);
+				
+			var a_Position = gl.getAttribLocation(program, "a_Position");
+			gl.vertexAttribPointer(a_Position, 3, gl.FLOAT, false, 0,0);
+			
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesBuffer);
+			gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
+				
+			gl.enableVertexAttribArray(a_Position);
+			
+			var u_xformMatrix = gl.getUniformLocation(program,"u_xformMatrix");
+			gl.uniformMatrix4fv(u_xformMatrix,false,this.matrix);
+			
+			var u_scaleMatrix = gl.getUniformLocation(program,"u_scaleMatrix");
+			gl.uniformMatrix4fv(u_scaleMatrix,false,this.scaleMatrix);
+			
+			if(texture !== undefined)
+			{
+				var u_sprite = gl.getUniformLocation(program,"u_sprite");
+				gl.activeTexture(gl.TEXTURE0);
+				gl.bindTexture(gl.TEXTURE_2D, texture);
+				gl.uniform1i(u_sprite, 0);
+				gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+				
+				gl.enable(gl.BLEND);
+			}
+			var u_color = gl.getUniformLocation(program,"u_color");
+			gl.uniform4fv(u_color,this.color);
+			
+			var u_tile = gl.getUniformLocation(program,"u_tile");
+			gl.uniform1f(u_tile,this.tile);
+		
+			gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
+		}
+	}
+
+	function CoinEatBehaviour(obj,map,coins, gameTrigger)
 	{
 		var scoreText = document.getElementById("score");
 		var score = 0;
@@ -645,19 +734,113 @@ function Pacman()
 				map[v1.y][v1.x] = 0;
 				score +=10;
 				scoreText.innerHTML = score;
+				gameTrigger.coins--;
 			}
 			
 		}.bind(this);
 	}
 	
+	function FoeAI(foeBehaviour)
+	{
+		var x = 0;
+		var y = 0;
+		var timeout = 3;
+		var time = 0;
+		
+		this.Update = function(dt)
+		{
+			if(time > timeout || foeBehaviour.Stopped)
+			{
+				time = 0;
+				if(Math.round(Math.random()) === 1)
+				{					
+					x = 1 - Math.round(Math.random()*2);
+					y = 0;
+				}
+				else
+				{
+					x= 0;
+					y = 1 - Math.round(Math.random()*2);
+				}
+			}
+			time+=dt;
+			foeBehaviour.SetInput(x,y);
+		}
+	}
+	
+	function FindPos(map,num)
+	{
+		var arr = [];
+		for(var n = 0; n < map.length; n++)
+			for(var k = 0; k < map[0].length; k++)
+				if(map[n][k] === num) arr.push({x:k,y:n});
+		return arr;
+	}
+	
+	function InitObjectArea(obj,num)
+	{
+		var arr = FindPos(map,num);
+		var i = Math.round(Math.random()*(arr.length-1));
+		var pos = arr[i];
+		MapCoordToWorld(pos,map.length,map[0].length);
+		obj.SetPosition(pos.x,pos.y);
+	}
+	function GameTrigger(map,foes,hero)
+	{
+		this.coins = FindPos(map,2).length;
+		this.gameState = 0; // 0:play, 1:win, 2:loose
+		
+		var v1 = {x:0,y:0};
+		var v2 = {x:0,y:0};
+		var v3 = {x:0,y:0};
+		var v4 = {x:0,y:0};
+		var dist = 1/map.length;
+		this.Update = function(dt)
+		{
+			hero.GetPosition(v1);
+			hero.GetPosition(v2);
+			ConvertToMapCoord(v1,map.length,map[0].length);
+			for(var i= 0; i < foes.length; i++)
+			{
+				foes[i].GetPosition(v3);
+				foes[i].GetPosition(v4);
+				ConvertToMapCoord(v3,map.length,map[0].length);
+				if(v1.x === v3.x && v1.y === v3.y)
+				{
+					v3.x = v2.x - v4.x;
+					v3.y = v2.y - v4.y;
+					if( Math.sqrt(v3.x*v3.x + v3.y*v3.y) < dist)
+						this.gameState = 2;
+				}
+			}
+			if(this.coins === 0 ) this.gameState = 1;
+		}.bind(this);
+	}
+	
+	
+	
 	var level = new LevelObject(gl);
 	var hero = new Hero(gl);
+	var foe = new Foe(gl);
+	var foeBehaviour = new MoveBehaviour(map, foe);
+	foeBehaviour.AnimateWhenStop = true;
+	foeBehaviour.applyAngle = false;
+	foeBehaviour.Speed = 0.5;
+	
+	var foeAI = new FoeAI(foeBehaviour);
 	
 	var heroBehaviour = new MoveBehaviour(map,hero);
 
 	var coins = new Points(gl);
-	var coinEat = new CoinEatBehaviour(hero,map,coins);
+	var gameTrigger = new GameTrigger(map,[foe],hero);
+	var coinEat = new CoinEatBehaviour(hero,map,coins,gameTrigger);
 	
+	InitObjectArea(foe,3);
+	InitObjectArea(hero,4);
+	
+	
+	
+	var updateHandler;
 	var inputX = 0;
 	var inputY = 0;
 	var heroSpeed = 1;
@@ -678,6 +861,12 @@ function Pacman()
 		inputX = Math.min(Math.max(-1,inputX),1);
 		inputY = Math.min(Math.max(-1,inputY),1);
 
+		
+		foeAI.Update(dt);
+		foeBehaviour.Update(dt);
+		foeBehaviour.AnimationUpdate(dt);
+		foe.Draw();
+		
 		heroBehaviour.SetInput(inputX,inputY);
 		heroBehaviour.Update(dt);
 		heroBehaviour.AnimationUpdate(dt);
@@ -687,6 +876,20 @@ function Pacman()
 
 		inputX = 0;
 		inputY = 0;
+		gameTrigger.Update(dt);
+		
+		if(gameTrigger.gameState !== 0)
+		{
+			clearInterval(updateHandler);
+			console.log("Game Ended:",gameTrigger.gameState);
+			var endGame = document.getElementById("endGame");
+			if(endGame !== null || endGame !== undefined)
+			{
+				if(gameTrigger.gameState === 1) endGame.innerHTML = "YOU WIN!";
+				else endGame.innerHTML = "YOU LOOSE!";
+				endGame.style.display = "block";
+			}
+		}
 	}
 	
 	function OnKeyUp()
@@ -728,7 +931,7 @@ function Pacman()
 	{
 		update(Date.now());
 	}
-	setInterval(animloop,1000/48); // 48 frames per second
+	updateHandler = setInterval(animloop,1000/48); // 48 frames per second
 	// use setInterval because all browsers base on Chromium have memory leak in requestAnimationFrame
 
 }
