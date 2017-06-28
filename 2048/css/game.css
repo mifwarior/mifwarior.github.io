@@ -1,0 +1,104 @@
+﻿body {
+	background-color: #faf8ef;
+	font-family: sans-serif;
+}
+.BatteryStatus {
+	background-color: #b5b5b5;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    position: absolute;
+}
+.Container{
+    top: 8rem;
+    height: 50%;
+    right: 0;
+    left: 0;
+    position: absolute;
+   /*background-color: blue;*/
+    text-align: center;
+}
+.GameView {
+    background-color: #b7afaf;
+    height: 100%;
+    max-width: 100%;
+    padding: 5px
+}
+.Window {
+	position: relative;
+    top: -50%;
+    width: 100%;
+    height: 55%;
+    text-align: center;
+    align-content: stretch;
+    vertical-align: middle;
+    font-size: xx-large;
+    font-weight: bold;
+}
+.Description {
+	position: absolute;
+    top: 6.5rem;
+    left: 0.5rem;
+    color: #777777;
+    font-size: small;
+}
+.GameResult {
+}
+
+.RestartButton {
+	position: absolute;
+    top: 4rem;
+    right: 0.5rem;
+    background-color: #999999;
+    height: 2rem;
+    width: 4rem;
+    border-radius: 5px;
+    text-align: center;
+    color: #efefef;
+}
+.RestartButton div {
+	padding-top: 0.5rem;
+}
+.BestResult {
+    right: 0.5rem;
+    width: 6rem;
+    top: 0.5rem;
+    background-color: #b7afaf;
+    border-radius: 5px;
+    text-align: center;
+    position: absolute;
+    padding-top: 0.5rem;
+    padding-bottom: 0.3rem;
+}
+
+.Score {
+    top: 0.5rem;
+    right: 8rem;
+    width: 6rem;
+    background-color: #b7afaf;
+    border-radius: 5px;
+    text-align: center;
+    position: absolute;
+    padding-top: 0.5rem;
+    padding-bottom: 0.3rem;
+}
+.Title {
+    top: 0.5rem;
+    left: 0.5rem;
+    width: 5rem;
+    height: 3rem;
+    background-color: #f7e149;
+    border-radius: 5px;
+    text-align: center;
+    color: #776e65;
+    font-size: xx-large;
+    font-weight: bold;
+    position: absolute;
+}
+.Title div {
+    padding-top: 0.3rem;
+}
+
+.Text {
+	color: white;
+}
