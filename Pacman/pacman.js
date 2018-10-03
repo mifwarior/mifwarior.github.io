@@ -882,13 +882,12 @@ function Pacman()
 		{
 			clearInterval(updateHandler);
 			console.log("Game Ended:",gameTrigger.gameState);
-			var endGame = document.getElementById("endGame");
-			if(endGame !== null || endGame !== undefined)
-			{
-				if(gameTrigger.gameState === 1) endGame.innerHTML = "YOU WIN!";
-				else endGame.innerHTML = "YOU LOOSE!";
-				endGame.style.display = "block";
-			}
+			var endGame = document.getElementById("endGameScreen");
+			var endGameStatus = document.getElementById("endGameStatus");
+		
+			if(gameTrigger.gameState === 1) endGameStatus.innerHTML = "YOU WIN!";
+			else endGameStatus.innerHTML = "YOU LOOSE!";
+			endGame.style.visibility = "visible";
 		}
 	}
 	
