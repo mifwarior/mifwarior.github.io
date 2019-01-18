@@ -1,0 +1,102 @@
+<html>
+	<head>
+		<title>Damage Calc</title>
+		<script src="./js/jquery-3.3.1.slim.min.js"></script>
+		<script src="./js/popper.min.js"></script>
+		<link rel="stylesheet" href="./css/bootstrap.min.css"/>
+		<script src="./js/bootstrap.min.js"></script>
+	</head>
+	<body>
+		<div class="container">
+			
+			<div class="jumbotron">
+			  <h1 class="display-4">Damage calculator</h1>
+			  <p class="lead">This is a damage calc, to deside when boost crit chance, crit mult, or simple damage</p>
+			  <hr class="my-4">
+			</div>
+			
+			<div class="row">
+				<div class="col">
+					<div class="input-group mb-3">
+					  <input id="baseDamage1" type="number" class="form-control" placeholder="BaseDamage" >
+					  <input id="critChance1" type="number" class="form-control" placeholder="CritChance" >
+					  <input id="critMult1" type="number" class="form-control" placeholder="CritMultiper" >
+					  <input id="attackRate1" type="number" class="form-control" placeholder="Attack rate" >
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<h5 class="col-12 col-md-3">OutputDamage:</h5> 
+				<div id="outputDamage1" class="col-12 col-md-9">0</div>
+			</div>
+			<div class="row">
+				<h5 class="col-12 col-md-3">DPS:</h5> 
+				<div id="dps1" class="col-12 col-md-9">0</div>
+			</div>
+			
+			<div class="row mt-3 mb-3">
+				<h2 class="col-12 text-center">VS</h2>
+			</div>
+			
+			<div class="row">
+				<div class="col">
+					<div class="input-group mb-3">
+					  <input id="baseDamage2" type="number" class="form-control" placeholder="BaseDamage" >
+					  <input id="critChance2" type="number" class="form-control" placeholder="CritChance" >
+					  <input id="critMult2" type="number" class="form-control" placeholder="CritMultiper" >
+					  <input id="attackRate2" type="number" class="form-control" placeholder="Attack rate" >
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<h5 class="col-12 col-md-3">OutputDamage:</h5> 
+				<div id="outputDamage2" class="col-12 col-md-9">0</div>
+			</div>
+			<div class="row">
+				<h5 class="col-12 col-md-3">DPS:</h5> 
+				<div id="dps2" class="col-12 col-md-9">0</div>
+			</div>
+		</div>
+		<canvas id="view"></canvas>
+		<script>
+			
+			SetupHandle(
+				document.getElementById("baseDamage1"),
+				document.getElementById("critChance1"),
+				document.getElementById("critMult1"),
+				document.getElementById("attackRate1"),
+				document.getElementById("outputDamage1"),
+				document.getElementById("dps1")
+			);
+			
+			SetupHandle(
+				document.getElementById("baseDamage2"),
+				document.getElementById("critChance2"),
+				document.getElementById("critMult2"),
+				document.getElementById("attackRate2"),
+				document.getElementById("outputDamage2"),
+				document.getElementById("dps2")
+			);
+			
+			function SetupHandle( baseDamageInput, critChanceInput, critMultInput, attackRateInput, outputDamage, dps)	{
+				function handleChange(e) {
+					var baseDamage = baseDamageInput.value;
+					var critChance = critChanceInput.value;
+					var critMult = critMultInput.value;
+					var attackRate = attackRateInput.value;
+				
+					outputDamage.innerHTML = calc(baseDamage, critChance, critMult);
+					dps.innerHTML = calc(baseDamage, critChance, critMult) * attackRate;
+				}
+				
+				baseDamageInput.onchange = handleChange;
+				critChanceInput.onchange = handleChange;
+				critMultInput.onchange = handleChange;
+				attackRateInput.onchange = handleChange;
+			}
+			function calc(baseDamage, critChance, critMult) {
+				return baseDamage * ( 1 + critChance * critMult);
+			}
+		</script>
+	</body>
+</html>
