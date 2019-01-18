@@ -95,7 +95,7 @@
 				attackRateInput.onchange = handleChange;
 			}
 			function calc(baseDamage, critChance, critMult) {
-				return baseDamage * ( 1 + critChance * critMult);
+				return baseDamage * ( 1 + critChance * (Math.max(critMult,1) - 1));
 			}
 		</script>
 	</body>
