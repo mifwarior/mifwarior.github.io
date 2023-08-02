@@ -5,7 +5,7 @@
 		var self = this;
 		var map;
 		var canvas = document.getElementById("view");
-		var renderer = new PIXI.autoDetectRenderer(270, 270, {view:document.getElementById("view"),autoResize:false,backgroundColor:0xb7afaf});
+		var renderer = new PIXI.autoDetectRenderer(270, 270, {view:document.getElementById("view"),autoResize:true,backgroundColor:0xb7afaf});
 		var stage;
 		var play = false;
 		var animFrame;
